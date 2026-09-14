@@ -1,0 +1,15 @@
+pandas
+numpy
+scikit-learn
+xgboost
+lightgbm
+imbalanced-learn
+shap
+optuna
+mlflow
+fastapi
+uvicorn
+sqlalchemy
+psycopg2-binary
+pydantic
+pytest
