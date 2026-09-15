@@ -24,6 +24,16 @@ def main():
     fraud_rate = df[TARGET_COL].mean() * 100
     print(f"Fraud rate: {fraud_rate:.2f}%")
 
+    print("\n===== FRAUD BY TRANSACTION HOUR =====")
+    fraud_by_hour = (
+        df.groupby("transaction_hour")[TARGET_COL]
+        .mean()
+        .mul(100)
+        .round(2)
+    )
+
+    print(fraud_by_hour)
+
 
 if __name__ == "__main__":
     main()
