@@ -31,8 +31,17 @@ def main():
         .mul(100)
         .round(2)
     )
-
     print(fraud_by_hour)
+
+    print("\n===== MISSING VALUES =====")
+    missing_values = df.isnull().sum()
+    print(missing_values)
+
+    print("\n===== DATA TYPES =====")
+    print(df.dtypes)
+
+    print("\n===== UNIQUE VALUES =====")
+    print(df.nunique())
 
 
 if __name__ == "__main__":
