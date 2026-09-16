@@ -34,14 +34,27 @@ def main():
     print(fraud_by_hour)
 
     print("\n===== MISSING VALUES =====")
-    missing_values = df.isnull().sum()
-    print(missing_values)
+    print(df.isnull().sum())
 
     print("\n===== DATA TYPES =====")
     print(df.dtypes)
 
     print("\n===== UNIQUE VALUES =====")
     print(df.nunique())
+
+    print("\n===== TOP 10 NUMERIC FEATURES BY CORRELATION =====")
+
+    numeric_df = df.select_dtypes(include="number")
+
+    correlations = (
+        numeric_df.corr()[TARGET_COL]
+        .drop(TARGET_COL)
+        .abs()
+        .sort_values(ascending=False)
+        .head(10)
+    )
+
+    print(correlations)
 
 
 if __name__ == "__main__":
