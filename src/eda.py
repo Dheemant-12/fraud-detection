@@ -56,6 +56,31 @@ def main():
 
     print(correlations)
 
+    print("\n===== CATEGORICAL FEATURE ANALYSIS =====")
+
+    categorical_columns = [
+        "transaction_type",
+        "payment_mode",
+        "device_type",
+        "device_location",
+    ]
+
+    for column in categorical_columns:
+        print(f"\n--- {column} ---")
+
+        print("Number of categories:", df[column].nunique())
+
+        fraud_by_category = (
+            df.groupby(column)[TARGET_COL]
+            .mean()
+            .mul(100)
+            .round(2)
+            .sort_values(ascending=False)
+        )
+
+        print("Fraud rate by category:")
+        print(fraud_by_category)
+
 
 if __name__ == "__main__":
     main()
