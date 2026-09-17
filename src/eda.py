@@ -5,44 +5,21 @@ from src.config import TARGET_COL
 def main():
     df = load_raw_data()
 
-    print("\n===== DATA INFO =====")
-    df.info()
+    print("\n===== DATASET OVERVIEW =====")
+    print(f"Rows: {len(df)}")
+    print(f"Columns: {len(df.columns)}")
 
-    print("\n===== DATA DESCRIPTION =====")
-    print(df.describe())
+    print("\n===== FRAUD DISTRIBUTION =====")
+    fraud_counts = df[TARGET_COL].value_counts()
+    print(fraud_counts)
 
-    print("\n===== FIRST 5 ROWS =====")
-    print(df.head())
-
-    print("\n===== DATASET SHAPE =====")
-    print(df.shape)
-
-    print("\n===== FRAUD COUNTS =====")
-    print(df[TARGET_COL].value_counts())
-
-    print("\n===== FRAUD RATE =====")
     fraud_rate = df[TARGET_COL].mean() * 100
-    print(f"Fraud rate: {fraud_rate:.2f}%")
-
-    print("\n===== FRAUD BY TRANSACTION HOUR =====")
-    fraud_by_hour = (
-        df.groupby("transaction_hour")[TARGET_COL]
-        .mean()
-        .mul(100)
-        .round(2)
-    )
-    print(fraud_by_hour)
+    print(f"\nFraud rate: {fraud_rate:.2f}%")
 
     print("\n===== MISSING VALUES =====")
     print(df.isnull().sum())
 
-    print("\n===== DATA TYPES =====")
-    print(df.dtypes)
-
-    print("\n===== UNIQUE VALUES =====")
-    print(df.nunique())
-
-    print("\n===== TOP 10 NUMERIC FEATURES BY CORRELATION =====")
+    print("\n===== NUMERIC FEATURES =====")
 
     numeric_df = df.select_dtypes(include="number")
 
@@ -51,12 +28,23 @@ def main():
         .drop(TARGET_COL)
         .abs()
         .sort_values(ascending=False)
-        .head(10)
     )
 
     print(correlations)
 
-    print("\n===== CATEGORICAL FEATURE ANALYSIS =====")
+    print("\n===== FRAUD BY TRANSACTION HOUR =====")
+
+    fraud_by_hour = (
+        df.groupby("transaction_hour")[TARGET_COL]
+        .mean()
+        .mul(100)
+        .round(2)
+        .sort_values(ascending=False)
+    )
+
+    print(fraud_by_hour)
+
+    print("\n===== CATEGORICAL FEATURES =====")
 
     categorical_columns = [
         "transaction_type",
@@ -68,8 +56,6 @@ def main():
     for column in categorical_columns:
         print(f"\n--- {column} ---")
 
-        print("Number of categories:", df[column].nunique())
-
         fraud_by_category = (
             df.groupby(column)[TARGET_COL]
             .mean()
@@ -78,8 +64,9 @@ def main():
             .sort_values(ascending=False)
         )
 
-        print("Fraud rate by category:")
         print(fraud_by_category)
+
+    print("\n===== EDA COMPLETE =====")
 
 
 if __name__ == "__main__":
