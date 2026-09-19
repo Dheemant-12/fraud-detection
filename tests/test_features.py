@@ -33,3 +33,16 @@ def test_user_transaction_count():
     assert "user_transaction_count" in result.columns
     assert result.loc[result["user_id"] == "U1", "user_transaction_count"].iloc[0] == 2
     assert result.loc[result["user_id"] == "U2", "user_transaction_count"].iloc[0] == 1
+def test_amount_ratio():
+    df = pd.DataFrame(
+        {
+            "user_id": ["U1", "U1", "U2"],
+            "transaction_amount": [100.0, 200.0, 500.0],
+        }
+    )
+
+    builder = FeatureBuilder()
+    result = builder.fit_transform(df)
+
+    assert "amount_ratio" in result.columns
+    assert result["amount_ratio"].notna().all()

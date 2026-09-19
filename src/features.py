@@ -51,7 +51,14 @@ class FeatureBuilder:
             how="left",
         )
 
+        # Add amount ratio
+        out["amount_ratio"] = (
+            out["transaction_amount"]
+            / out["hist_mean"].replace(0, 1)
+        )
+
         return out
+
 
     def fit_transform(self, df: pd.DataFrame) -> pd.DataFrame:
         return self.fit(df).transform(df)
