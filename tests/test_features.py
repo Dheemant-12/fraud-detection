@@ -46,3 +46,19 @@ def test_amount_ratio():
 
     assert "amount_ratio" in result.columns
     assert result["amount_ratio"].notna().all()
+def test_risk_login_interaction():
+    df = pd.DataFrame(
+        {
+            "user_id": ["U1", "U1"],
+            "transaction_amount": [100.0, 200.0],
+            "ip_risk_score": [10, 20],
+            "login_attempts_last_24h": [2, 3],
+        }
+    )
+
+    builder = FeatureBuilder()
+    result = builder.fit_transform(df)
+
+    assert "risk_login_interaction" in result.columns
+    assert result.loc[0, "risk_login_interaction"] == 20
+    assert result.loc[1, "risk_login_interaction"] == 60

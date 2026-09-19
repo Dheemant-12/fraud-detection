@@ -57,8 +57,17 @@ class FeatureBuilder:
             / out["hist_mean"].replace(0, 1)
         )
 
-        return out
+        # Add risk and login interaction feature
+        if {
+            "ip_risk_score",
+            "login_attempts_last_24h",
+        }.issubset(out.columns):
+            out["risk_login_interaction"] = (
+                out["ip_risk_score"]
+                * out["login_attempts_last_24h"]
+            )
 
+        return out
 
     def fit_transform(self, df: pd.DataFrame) -> pd.DataFrame:
         return self.fit(df).transform(df)
