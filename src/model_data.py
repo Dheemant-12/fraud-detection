@@ -8,7 +8,7 @@ def load_model_data(split_name: str):
 
     df = pd.read_csv(file_path)
 
-    # Remove target from input features
+    # Separate target
     X = df.drop(columns=[TARGET_COL])
     y = df[TARGET_COL]
 
@@ -23,11 +23,23 @@ def load_model_data(split_name: str):
         errors="ignore",
     )
 
-    # Convert categorical columns into dummy variables
+    # Convert categorical columns to numeric dummy variables
     X = pd.get_dummies(
         X,
         drop_first=True,
     )
+
+    # Replace infinite values
+    X = X.replace(
+        [float("inf"), float("-inf")],
+        pd.NA,
+    )
+
+    # Convert all columns to numeric
+    X = X.apply(pd.to_numeric, errors="coerce")
+
+    # Fill missing numeric values
+    X = X.fillna(0)
 
     return X, y
 
@@ -38,6 +50,9 @@ def main():
     print("Model data preparation complete")
     print(f"X shape: {X_train.shape}")
     print(f"y shape: {y_train.shape}")
+
+    print("\nMissing values:")
+    print(X_train.isna().sum().sum())
 
     print("\nFeature columns:")
     print(X_train.columns.tolist())
