@@ -1,10 +1,13 @@
-import joblib
-import pandas as pd
+import json
 
+import joblib
 from sklearn.metrics import (
     accuracy_score,
     classification_report,
     confusion_matrix,
+    precision_score,
+    recall_score,
+    f1_score,
 )
 
 from src.config import MODEL_DIR
@@ -32,21 +35,42 @@ def main():
     # Generate predictions
     predictions = model.predict(X_test)
 
-    # Display evaluation results
-    print("Accuracy:")
-    print(accuracy_score(y_test, predictions))
-
-    print("\nConfusion Matrix:")
-    print(confusion_matrix(y_test, predictions))
-
-    print("\nClassification Report:")
-    print(
-        classification_report(
+    # Calculate metrics
+    results = {
+        "accuracy": accuracy_score(y_test, predictions),
+        "precision": precision_score(
             y_test,
             predictions,
             zero_division=0,
-        )
-    )
+        ),
+        "recall": recall_score(
+            y_test,
+            predictions,
+            zero_division=0,
+        ),
+        "f1_score": f1_score(
+            y_test,
+            predictions,
+            zero_division=0,
+        ),
+        "confusion_matrix": confusion_matrix(
+            y_test,
+            predictions,
+        ).tolist(),
+    }
+
+    # Print results
+    print("Model Evaluation Results:")
+    for metric, value in results.items():
+        print(f"{metric}: {value}")
+
+    # Save results
+    output_path = MODEL_DIR / "evaluation_results.json"
+
+    with open(output_path, "w") as file:
+        json.dump(results, file, indent=4)
+
+    print(f"\nEvaluation results saved to: {output_path}")
 
 
 if __name__ == "__main__":
