@@ -75,6 +75,16 @@ def main():
                     predictions,
                     zero_division=0,
                 ),
+                "false_positive_cost": (
+                    fp * COST_FALSE_POSITIVE
+                ),
+                "false_negative_cost": (
+                    fn * COST_FALSE_NEGATIVE
+                ),
+                "total_cost": (
+                    fp * COST_FALSE_POSITIVE
+                    + fn * COST_FALSE_NEGATIVE
+                ),
                 "false_positives": fp,
                 "false_negatives": fn,
                 "total_cost": total_cost,
