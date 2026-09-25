@@ -86,3 +86,13 @@ def main():
 
 if __name__ == "__main__":
     main()
+from sklearn.metrics import (
+    accuracy_score,
+    classification_report,
+    confusion_matrix,
+    precision_score,
+    recall_score,
+    f1_score,
+    roc_auc_score,
+    average_precision_score,
+)
