@@ -8,6 +8,7 @@ from sklearn.metrics import (
     precision_score,
     recall_score,
     f1_score,
+    roc_auc_score,
 )
 
 from src.config import MODEL_DIR
@@ -35,6 +36,9 @@ def main():
     # Generate predictions
     predictions = model.predict(X_test)
 
+    # Generate fraud probabilities
+    probabilities = model.predict_proba(X_test)[:, 1]
+
     # Calculate metrics
     results = {
         "accuracy": accuracy_score(y_test, predictions),
@@ -53,6 +57,10 @@ def main():
             predictions,
             zero_division=0,
         ),
+        "roc_auc": roc_auc_score(
+            y_test,
+            probabilities,
+        ),
         "confusion_matrix": confusion_matrix(
             y_test,
             predictions,
@@ -61,6 +69,7 @@ def main():
 
     # Print results
     print("Model Evaluation Results:")
+
     for metric, value in results.items():
         print(f"{metric}: {value}")
 
@@ -70,7 +79,9 @@ def main():
     with open(output_path, "w") as file:
         json.dump(results, file, indent=4)
 
-    print(f"\nEvaluation results saved to: {output_path}")
+    print(
+        f"\nEvaluation results saved to: {output_path}"
+    )
 
 
 if __name__ == "__main__":
