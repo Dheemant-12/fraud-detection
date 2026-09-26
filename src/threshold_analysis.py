@@ -5,9 +5,15 @@ from sklearn.metrics import (
     precision_score,
     recall_score,
     f1_score,
+    confusion_matrix,
 )
 
-from src.config import MODEL_DIR
+from src.config import (
+    MODEL_DIR,
+    COST_FALSE_NEGATIVE,
+    COST_FALSE_POSITIVE,
+)
+
 from src.model_data import load_model_data
 
 
@@ -41,6 +47,16 @@ def main():
             probabilities >= threshold
         ).astype(int)
 
+        tn, fp, fn, tp = confusion_matrix(
+            y_test,
+            predictions,
+        ).ravel()
+
+        total_cost = (
+            fn * COST_FALSE_NEGATIVE
+            + fp * COST_FALSE_POSITIVE
+        )
+
         results.append(
             {
                 "threshold": threshold,
@@ -59,13 +75,18 @@ def main():
                     predictions,
                     zero_division=0,
                 ),
+                "false_positives": fp,
+                "false_negatives": fn,
+                "total_cost": total_cost,
             }
         )
 
     results_df = pd.DataFrame(results)
 
-    print("\nThreshold Analysis:")
-    print(results_df.to_string(index=False))
+    print("\nCost-Sensitive Threshold Analysis:")
+    print(
+        results_df.to_string(index=False)
+    )
 
 
 if __name__ == "__main__":
