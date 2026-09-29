@@ -1,6 +1,5 @@
 from fastapi import FastAPI
-from pydantic import BaseModel
-
+from pydantic import BaseModel, Field
 from src.predict import predict_transaction
 
 
@@ -12,25 +11,24 @@ app = FastAPI(
 
 
 class Transaction(BaseModel):
-    transaction_amount: float
+    transaction_amount: float = Field(gt=0)
     transaction_type: str
     payment_mode: str
     device_type: str
     device_location: str
-    account_age_days: int
-    transaction_hour: int
-    previous_failed_attempts: int
-    avg_transaction_amount: float
-    is_international: int
-    ip_risk_score: float
-    login_attempts_last_24h: int
-    hist_mean: float
-    hist_std: float
+    account_age_days: int = Field(ge=0)
+    transaction_hour: int = Field(ge=0, le=23)
+    previous_failed_attempts: int = Field(ge=0)
+    avg_transaction_amount: float = Field(ge=0)
+    is_international: int = Field(ge=0, le=1)
+    ip_risk_score: float = Field(ge=0, le=100)
+    login_attempts_last_24h: int = Field(ge=0)
+    hist_mean: float = Field(ge=0)
+    hist_std: float = Field(ge=0)
     amount_deviation: float
-    user_transaction_count: int
-    amount_ratio: float
-    risk_login_interaction: float
-
+    user_transaction_count: int = Field(ge=0)
+    amount_ratio: float = Field(ge=0)
+    risk_login_interaction: float = Field(ge=0)
 
 @app.get("/")
 def home():
