@@ -42,5 +42,10 @@ def predict(transaction: Transaction):
     result = predict_transaction(
         transaction.model_dump()
     )
-
     return result
+@app.get("/health")
+def health_check():
+    return {
+        "status": "healthy",
+        "model": "logistic_regression",
+    }

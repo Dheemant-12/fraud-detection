@@ -107,3 +107,13 @@ def test_invalid_ip_risk_score():
     )
 
     assert response.status_code == 422
+
+def test_health():
+    response = client.get("/health")
+
+    assert response.status_code == 200
+
+    result = response.json()
+
+    assert result["status"] == "healthy"
+    assert result["model"] == "logistic_regression"
