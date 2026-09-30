@@ -48,9 +48,16 @@ def test_predict():
 
     assert "fraud_probability" in result
     assert "prediction" in result
+    assert "status" in result
 
     assert 0 <= result["fraud_probability"] <= 1
     assert result["prediction"] in [0, 1]
+    assert result["status"] in [
+        "fraud",
+        "legitimate",
+    ]
+
+
 def test_invalid_transaction_hour():
     transaction = {
         "transaction_amount": 2500,
@@ -79,6 +86,8 @@ def test_invalid_transaction_hour():
     )
 
     assert response.status_code == 422
+
+
 def test_invalid_ip_risk_score():
     transaction = {
         "transaction_amount": 2500,
@@ -107,6 +116,7 @@ def test_invalid_ip_risk_score():
     )
 
     assert response.status_code == 422
+
 
 def test_health():
     response = client.get("/health")

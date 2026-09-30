@@ -42,6 +42,13 @@ def predict(transaction: Transaction):
     result = predict_transaction(
         transaction.model_dump()
     )
+
+    result["status"] = (
+        "fraud"
+        if result["prediction"] == 1
+        else "legitimate"
+    )
+
     return result
 @app.get("/health")
 def health_check():
