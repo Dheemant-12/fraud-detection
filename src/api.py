@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from pydantic import BaseModel, Field
 from src.predict import predict_transaction
-
+from datetime import datetime, timezone
 
 app = FastAPI(
     title="Fraud Detection API",
@@ -48,6 +48,11 @@ def predict(transaction: Transaction):
         if result["prediction"] == 1
         else "legitimate"
     )
+
+    result["model_version"] = "1.0.0"
+    result["timestamp"] = datetime.now(
+        timezone.utc
+    ).isoformat()
 
     return result
 @app.get("/health")

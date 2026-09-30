@@ -49,14 +49,18 @@ def test_predict():
     assert "fraud_probability" in result
     assert "prediction" in result
     assert "status" in result
+    assert "model_version" in result
+    assert "timestamp" in result
 
     assert 0 <= result["fraud_probability"] <= 1
     assert result["prediction"] in [0, 1]
+
     assert result["status"] in [
         "fraud",
         "legitimate",
     ]
 
+    assert result["model_version"] == "1.0.0"
 
 def test_invalid_transaction_hour():
     transaction = {
