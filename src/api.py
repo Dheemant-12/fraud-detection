@@ -1,7 +1,18 @@
+import logging
+from datetime import datetime, timezone
+
 from fastapi import FastAPI
 from pydantic import BaseModel, Field
+
 from src.predict import predict_transaction
-from datetime import datetime, timezone
+
+
+logging.basicConfig(
+    level=logging.INFO,
+)
+
+logger = logging.getLogger(__name__)
+
 
 app = FastAPI(
     title="Fraud Detection API",
@@ -30,6 +41,7 @@ class Transaction(BaseModel):
     amount_ratio: float = Field(ge=0)
     risk_login_interaction: float = Field(ge=0)
 
+
 @app.get("/")
 def home():
     return {
@@ -50,11 +62,20 @@ def predict(transaction: Transaction):
     )
 
     result["model_version"] = "1.0.0"
+
     result["timestamp"] = datetime.now(
         timezone.utc
     ).isoformat()
 
+    logger.info(
+        "Prediction made: status=%s probability=%.4f",
+        result["status"],
+        result["fraud_probability"],
+    )
+
     return result
+
+
 @app.get("/health")
 def health_check():
     return {
