@@ -13,3 +13,9 @@ sqlalchemy
 psycopg2-binary
 pydantic
 pytest
+fastapi
+uvicorn
+pydantic
+pandas
+scikit-learn
+joblib
