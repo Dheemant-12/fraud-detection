@@ -1,14 +1,11 @@
-import joblib
 import pandas as pd
 
-from src.config import MODEL_DIR
+from src.model_loader import load_model
 
 
 def predict_transaction(transaction: dict):
     # Load saved model
-    saved_model = joblib.load(
-        MODEL_DIR / "logistic_regression.pkl"
-    )
+    saved_model = load_model()
 
     model = saved_model["model"]
     feature_columns = saved_model["features"]
