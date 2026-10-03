@@ -131,3 +131,13 @@ def test_health():
 
     assert result["status"] == "healthy"
     assert result["model"] == "logistic_regression"
+def test_model_info():
+    response = client.get("/model-info")
+
+    assert response.status_code == 200
+
+    result = response.json()
+
+    assert result["model"] == "logistic_regression"
+    assert result["version"] == "1.0.0"
+    assert result["task"] == "fraud_detection"

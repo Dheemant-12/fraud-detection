@@ -1,5 +1,6 @@
 import logging
 from datetime import datetime, timezone
+from pathlib import Path
 
 from fastapi import FastAPI
 from pydantic import BaseModel, Field
@@ -7,13 +8,16 @@ from pydantic import BaseModel, Field
 from src.predict import predict_transaction
 
 
+LOG_DIR = Path("logs")
+LOG_DIR.mkdir(parents=True, exist_ok=True)
+
 logging.basicConfig(
     level=logging.INFO,
+    filename=LOG_DIR / "predictions.log",
+    format="%(asctime)s - %(levelname)s - %(message)s",
 )
 
 logger = logging.getLogger(__name__)
-
-
 app = FastAPI(
     title="Fraud Detection API",
     description="API for predicting fraudulent transactions",
@@ -81,4 +85,11 @@ def health_check():
     return {
         "status": "healthy",
         "model": "logistic_regression",
+    }
+@app.get("/model-info")
+def model_info():
+    return {
+        "model": "logistic_regression",
+        "version": "1.0.0",
+        "task": "fraud_detection",
     }
