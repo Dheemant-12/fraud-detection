@@ -1,0 +1,8 @@
+{
+    "model_name": "logistic_regression",
+    "version": "1.0.0",
+    "task": "fraud_detection",
+    "random_seed": 42,
+    "class_weight": "balanced",
+    "max_iterations": 1000
+}
