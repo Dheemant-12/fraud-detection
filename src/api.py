@@ -5,7 +5,7 @@ from pathlib import Path
 from fastapi import FastAPI
 from pydantic import BaseModel, Field
 
-from src.predict import predict_transaction
+from src.prediction_service import predict
 from src.config import MODEL_NAME, MODEL_VERSION
 
 LOG_DIR = Path("logs")
@@ -55,7 +55,7 @@ def home():
 
 @app.post("/predict")
 def predict(transaction: Transaction):
-    result = predict_transaction(
+    result = predict(
         transaction.model_dump()
     )
 
