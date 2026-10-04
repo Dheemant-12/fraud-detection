@@ -6,7 +6,7 @@ from fastapi import FastAPI
 from pydantic import BaseModel, Field
 
 from src.predict import predict_transaction
-
+from src.config import MODEL_NAME, MODEL_VERSION
 
 LOG_DIR = Path("logs")
 LOG_DIR.mkdir(parents=True, exist_ok=True)
@@ -65,7 +65,7 @@ def predict(transaction: Transaction):
         else "legitimate"
     )
 
-    result["model_version"] = "1.0.0"
+    result["model_version"] = MODEL_VERSION
 
     result["timestamp"] = datetime.now(
         timezone.utc
@@ -84,10 +84,15 @@ def predict(transaction: Transaction):
 def health_check():
     return {
         "status": "healthy",
-        "model": "logistic_regression",
+        "model": MODEL_NAME,
     }
 @app.get("/model-info")
 def model_info():
+    return {
+        "model": MODEL_NAME,
+        "version": MODEL_VERSION,
+        "task": "fraud_detection",
+    }
     return {
         "model": "logistic_regression",
         "version": "1.0.0",

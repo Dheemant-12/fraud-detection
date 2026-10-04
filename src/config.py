@@ -13,3 +13,5 @@ TARGET_COL = "fraud_label"
 # Cost matrix — dollars
 COST_FALSE_NEGATIVE = 500
 COST_FALSE_POSITIVE = 50
+MODEL_NAME = "logistic_regression"
+MODEL_VERSION = "1.0.0"
