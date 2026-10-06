@@ -1,43 +1,36 @@
 import pandas as pd
 
+from src.config import PREDICTION_THRESHOLD
 from src.model_loader import load_model
 
 
 def predict_transaction(transaction: dict):
-    # Load saved model
     saved_model = load_model()
 
     model = saved_model["model"]
     feature_columns = saved_model["features"]
 
-    # Convert transaction into DataFrame
     df = pd.DataFrame([transaction])
 
-    # Remove identifiers
     df = df.drop(
         columns=["transaction_id", "user_id"],
         errors="ignore",
     )
 
-    # Convert categorical columns
     df = pd.get_dummies(
         df,
         drop_first=True,
     )
 
-    # Match training features
     df = df.reindex(
         columns=feature_columns,
         fill_value=0,
     )
 
-    # Make prediction
-    fraud_probability = model.predict_proba(
-        df
-    )[0][1]
+    fraud_probability = model.predict_proba(df)[0][1]
 
     prediction = int(
-        fraud_probability >= 0.5
+        fraud_probability >= PREDICTION_THRESHOLD
     )
 
     return {
@@ -68,9 +61,7 @@ if __name__ == "__main__":
         "risk_login_interaction": 400,
     }
 
-    result = predict_transaction(
-        sample_transaction
-    )
+    result = predict_transaction(sample_transaction)
 
     print("\nPrediction:")
     print(result)
