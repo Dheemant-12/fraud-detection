@@ -25,8 +25,13 @@ def test_prediction_service():
 
     result = predict(transaction)
 
-    assert "fraud_probability" in result
-    assert "prediction" in result
+    assert set(result.keys()) == {
+        "fraud_probability",
+        "prediction",
+    }
+
+    assert isinstance(result["fraud_probability"], float)
+    assert isinstance(result["prediction"], int)
 
     assert 0 <= result["fraud_probability"] <= 1
     assert result["prediction"] in [0, 1]
