@@ -98,3 +98,30 @@ def model_info():
         "version": "1.0.0",
         "task": "fraud_detection",
     }
+@app.post("/predict")
+def predict_endpoint(transaction: Transaction):
+    try:
+        result = predict(transaction.model_dump())
+
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=400,
+            detail=str(exc),
+        )
+
+    result["status"] = (
+        "fraud"
+        if result["prediction"] == 1
+        else "legitimate"
+    )
+
+    result["model_version"] = MODEL_VERSION
+    result["timestamp"] = datetime.now(timezone.utc).isoformat()
+
+    logger.info(
+        "Prediction made: status=%s probability=%.4f",
+        result["status"],
+        result["fraud_probability"],
+    )
+
+    return result
