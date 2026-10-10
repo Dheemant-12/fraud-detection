@@ -1,12 +1,15 @@
+
 import logging
 from datetime import datetime, timezone
 from pathlib import Path
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
-from src.prediction_service import predict
 from src.config import MODEL_NAME, MODEL_VERSION
+from src.prediction_service import predict as predict_service
+
 
 LOG_DIR = Path("logs")
 LOG_DIR.mkdir(parents=True, exist_ok=True)
@@ -18,6 +21,7 @@ logging.basicConfig(
 )
 
 logger = logging.getLogger(__name__)
+
 app = FastAPI(
     title="Fraud Detection API",
     description="API for predicting fraudulent transactions",
@@ -25,6 +29,28 @@ app = FastAPI(
 )
 
 
+# Global handler for unexpected errors
+@app.exception_handler(Exception)
+async def global_exception_handler(
+    request: Request,
+    exc: Exception,
+):
+    logger.error(
+        "Unhandled API error on %s %s: %s",
+        request.method,
+        request.url.path,
+        exc,
+    )
+
+    return JSONResponse(
+        status_code=500,
+        content={
+            "detail": "An internal server error occurred."
+        },
+    )
+
+
+# Transaction input validation
 class Transaction(BaseModel):
     transaction_amount: float = Field(gt=0)
     transaction_type: str
@@ -54,10 +80,15 @@ def home():
 
 
 @app.post("/predict")
-def predict(transaction: Transaction):
-    result = predict(
-        transaction.model_dump()
-    )
+def predict_endpoint(transaction: Transaction):
+    try:
+        result = predict_service(transaction.model_dump())
+
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=400,
+            detail=str(exc),
+        ) from exc
 
     result["status"] = (
         "fraud"
@@ -66,7 +97,6 @@ def predict(transaction: Transaction):
     )
 
     result["model_version"] = MODEL_VERSION
-
     result["timestamp"] = datetime.now(
         timezone.utc
     ).isoformat()
@@ -86,6 +116,8 @@ def health_check():
         "status": "healthy",
         "model": MODEL_NAME,
     }
+
+
 @app.get("/model-info")
 def model_info():
     return {
@@ -93,35 +125,3 @@ def model_info():
         "version": MODEL_VERSION,
         "task": "fraud_detection",
     }
-    return {
-        "model": "logistic_regression",
-        "version": "1.0.0",
-        "task": "fraud_detection",
-    }
-@app.post("/predict")
-def predict_endpoint(transaction: Transaction):
-    try:
-        result = predict(transaction.model_dump())
-
-    except ValueError as exc:
-        raise HTTPException(
-            status_code=400,
-            detail=str(exc),
-        )
-
-    result["status"] = (
-        "fraud"
-        if result["prediction"] == 1
-        else "legitimate"
-    )
-
-    result["model_version"] = MODEL_VERSION
-    result["timestamp"] = datetime.now(timezone.utc).isoformat()
-
-    logger.info(
-        "Prediction made: status=%s probability=%.4f",
-        result["status"],
-        result["fraud_probability"],
-    )
-
-    return result
