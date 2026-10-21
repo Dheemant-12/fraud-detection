@@ -41,3 +41,15 @@ def test_invalid_input_does_not_call_model(mock_predict):
         predict(transaction)
 
     mock_predict.assert_not_called()
+
+@patch("src.prediction_service.predict_transaction")
+def test_empty_transaction(mock_predict):
+    transaction = {}
+
+    with pytest.raises(
+        ValueError,
+        match="Missing required fields",
+    ):
+        predict(transaction)
+
+    mock_predict.assert_not_called()
