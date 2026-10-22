@@ -300,3 +300,68 @@ def test_global_error_handler():
         "detail": "An internal server error occurred."
     }
     assert "Internal model failure" not in response.text
+
+def test_transaction_hour_boundaries():
+    base_transaction = {
+        "transaction_amount": 2500,
+        "transaction_type": "online",
+        "payment_mode": "card",
+        "device_type": "mobile",
+        "device_location": "foreign",
+        "account_age_days": 0,
+        "transaction_hour": 0,
+        "previous_failed_attempts": 0,
+        "avg_transaction_amount": 0,
+        "is_international": 0,
+        "ip_risk_score": 0,
+        "login_attempts_last_24h": 0,
+        "hist_mean": 0,
+        "hist_std": 0,
+        "amount_deviation": 0,
+        "user_transaction_count": 0,
+        "amount_ratio": 0,
+        "risk_login_interaction": 0,
+    }
+
+    for hour in (0, 23):
+        transaction = {
+            **base_transaction,
+            "transaction_hour": hour,
+        }
+
+        response = client.post("/predict", json=transaction)
+
+        assert response.status_code == 200
+
+
+def test_ip_risk_score_boundaries():
+    base_transaction = {
+        "transaction_amount": 2500,
+        "transaction_type": "online",
+        "payment_mode": "card",
+        "device_type": "mobile",
+        "device_location": "foreign",
+        "account_age_days": 0,
+        "transaction_hour": 12,
+        "previous_failed_attempts": 0,
+        "avg_transaction_amount": 0,
+        "is_international": 0,
+        "ip_risk_score": 0,
+        "login_attempts_last_24h": 0,
+        "hist_mean": 0,
+        "hist_std": 0,
+        "amount_deviation": 0,
+        "user_transaction_count": 0,
+        "amount_ratio": 0,
+        "risk_login_interaction": 0,
+    }
+
+    for score in (0, 100):
+        transaction = {
+            **base_transaction,
+            "ip_risk_score": score,
+        }
+
+        response = client.post("/predict", json=transaction)
+
+        assert response.status_code == 200
