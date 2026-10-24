@@ -23,3 +23,18 @@ def test_risk_level(probability, expected):
 def test_invalid_probability(probability):
     with pytest.raises(ValueError):
         get_risk_level(probability)
+
+def test_medium_risk_lower_boundary():
+    assert get_risk_level(0.40) == "medium"
+
+
+def test_high_risk_lower_boundary():
+    assert get_risk_level(0.70) == "high"
+
+
+def test_low_risk_upper_boundary():
+    assert get_risk_level(0.3999) == "low"
+
+
+def test_medium_risk_upper_boundary():
+    assert get_risk_level(0.6999) == "medium"
