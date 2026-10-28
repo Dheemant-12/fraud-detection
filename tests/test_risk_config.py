@@ -1,22 +1,31 @@
 
-from src.risk_assessment import get_risk_level
+import pytest
+
+from src.risk_assessment import (
+    get_risk_level,
+    validate_risk_thresholds,
+)
 
 
-def test_configured_low_risk_boundary():
-    assert get_risk_level(0.40) == "medium"
+def test_valid_thresholds():
+    validate_risk_thresholds(0.40, 0.70)
 
 
-def test_configured_high_risk_boundary():
-    assert get_risk_level(0.70) == "high"
+@pytest.mark.parametrize(
+    "low, high",
+    [
+        (-0.1, 0.70),
+        (0.40, 1.1),
+        (0.70, 0.40),
+        (0.50, 0.50),
+    ],
+)
+def test_invalid_thresholds(low, high):
+    with pytest.raises(ValueError):
+        validate_risk_thresholds(low, high)
 
 
-def test_probability_below_low_boundary():
-    assert get_risk_level(0.39) == "low"
-
-
-def test_probability_between_boundaries():
-    assert get_risk_level(0.55) == "medium"
-
-
-def test_probability_above_high_boundary():
-    assert get_risk_level(0.90) == "high"
+def test_default_risk_classification():
+    assert get_risk_level(0.20) == "low"
+    assert get_risk_level(0.50) == "medium"
+    assert get_risk_level(0.80) == "high"
